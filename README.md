@@ -1,2 +1,2 @@
 # texpokerkurs
-do later
+сделать сравнение и вывод в файлы
