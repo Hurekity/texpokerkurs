@@ -1,0 +1,210 @@
+#include <time.h>
+#include <iostream>
+#include <Windows.h>
+#include <algorithm>
+#include "cards.h" // Карты на руках игрока
+#include "allcards.h" // Карты с общей руки
+#include "result.h" // Подсчет карт
+#define cardssize 2 // На руках у игрока
+#define money 250 // Деньги
+#define allcardssize 5 // Размер карт с общей руки, потом до 5 увеличить
+#define allinonesize 7 // Объединение массивов
+using namespace std;
+enum choice { Exit = 1, Conti = 2 };
+enum secchoice { secExit = 1, Check = 2 };
+enum thchoice { thExit = 1, Cocheck = 2};
+enum rules { Newbie = 1, Adept = 2 };
+void showcardsnames(int* pthisnecessity) // Показ карт и их значений. Масти и ранги
+{
+    if (*pthisnecessity == 1)
+        cout << " 1 -- Бубы\t";
+    cout << "2 -- Черви\t";
+    cout << "3 -- Трефы\t";
+    cout << "4 -- Пики" << endl;
+    cout << "------------------------------------------------------------" << endl;
+    cout << " 2 -- Двойка\t";
+    cout << "3 -- Тройка\t";
+    cout << "4 -- Четвёрка\t";
+    cout << "5 -- Пятёрка" << endl;
+    cout << " 6 -- Шестёрка\t";
+    cout << "7 -- Семерка\t";
+    cout << "8 -- Восьмёрка\t";
+    cout << "9 -- Девятка" << endl;
+    cout << " 10 -- Десятка\t";
+    cout << "11 -- Валет\t";
+    cout << "12 -- Дама\t";
+    cout << "13 -- Король" << endl;
+    cout << "\t\t          14 -- Туз"; // Криво, потому что он посередине
+}
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    srand(time(NULL)); // Рандомайзер  
+    // ---------------------------------------
+    int userchoice, bet;
+    int thisisnecessity = 1; // Переменная для вывода функцией комбы карт и их значения(не менять)
+    string username;
+    cout << "Welcome to Texas Poker" << endl;
+    cout << "--------------------------" << endl;
+    cout << "Вы новичок(доступ к правилам) или уже опытный игрок?" << endl;
+    cout << "Новичок - 1,\tОпытный - 2 - ? "; cin >> userchoice;
+    switch (userchoice)
+    {
+    case Newbie:
+    {
+        cout << "Хорошо, правила техасского покера:" << endl; // Строка для правил
+        cout << "Покер – карточная игра, цель которой состоит в том чтобы собрать наилучшую комбинацию и выиграть ставки." << endl; // Правила
+        cout << "Каждая раздача в покере начинается с обязательных ставок. Перед раздачей карт два игрока ставят обязательные ставки - малый и большой блайнды." << endl;
+        cout << "Малый блайнд в два раза меньше большого." << endl;
+        cout << "Эти ставки нужны для того, чтобы участникам раздачи было за что бороться." << endl;
+        cout << "В каждом раунде торговля продолжается до человека, сидящего справа от последнего игрока, сделавшего ставку." << endl;
+        cout << "После того как все игроки получили свои карты, каждый из них решает, что он будет делать - откажется от борьбы за банк и скинет свои карты." << endl;
+        cout << "Или постарается продолжить игру сделав колл размером в один большой блайнд или же рэйз размером как минимум два больших блайнда." << endl;
+        cout << "По окончании раунда торговли, все ставки сделанные игроками собираются в один общий банк, за который продолжится борьба." << endl;
+        cout << "После завершения торгов на терне на стол выкладывается пятая и последняя карта – ривер (от англ. «river»)." << endl;
+        cout << "После открытия карты ривера, игроки анализируют собранные ими финальные комбинации и проводят завершающий раунд торговли." << endl;
+        cout << "По правилам покера игроки, которые уравняли все ставки на предыдущих улицах, принимают участие в последнем раунде игры – вскрытии карт." << endl;
+        cout << "Именно здесь определяется победитель, который и забирает банк. Все игроки показывают свои комбинации." << endl;
+        cout << "Выигрывает самая сильная пятикарточная комбинация (рука), которую игрок составляет из всех доступных ему карт." << endl;
+        break;
+    }
+    case Adept:
+    {
+        cout << "Хорошо, перейдем к следующему шагу" << endl;
+        break;
+    }
+    default:
+        cout << "Даного пункта нет в меню" << endl;
+        abort();
+    }
+    cout << "Пожалуйста, введите свой ник -- "; cin >> username;
+    cout << "И так, " << username << ", приступим к началу игры." << endl;
+    cout << "В игре обозначения на английском. Список ниже:" << endl;
+    showcardsnames(&thisisnecessity); // Показ карт и их ранги
+    //------------------------------------------
+    int* p_cardsrank = new int[cardssize];
+    int* p_suitsrank = new int[cardssize];
+    cout << "\n\n\t\t\tНачинаем игру!" << endl;
+    cout << " У вас есть " << money << "$" << endl;
+    cout << "Для начала, сделайте ставку - "; cin >> bet;
+    if (bet > 250)
+        abort();
+    int result = money - bet;
+    cout << "Хорошо, у вас осталось " << result << "$" << endl;
+    cout << "  Накрываем поле..." << endl;
+    Sleep(1000);
+    cout << "  Тасуем карты..." << endl;
+    Sleep(1000);
+    cout << "     Ваши карты: ";
+    fillandshowcards(p_cardsrank, cardssize);
+    cout << endl;
+    cout << "     Масти карт: ";
+    fillandshowsuits(p_suitsrank, cardssize);
+    //------------------------------------------
+    int secuserchoice;
+    cout << "\n Ваш выбор: " << endl;
+    cout << " 1 - Выйти из игры\n 2 - Продолжить игру - "; cin >> secuserchoice;
+    switch (secuserchoice)
+    {
+    case Exit:
+    {
+        cout << "Хорошо, до свидания.";
+        break;
+    }
+    case Conti:
+    {
+        cout << "Хорошо, продолжаем."; 
+        break;
+    }
+    default:
+    {
+        cout << "Данного пункта нет в меню." << endl;
+        break;
+    }
+    }
+    //------------------------------------------
+    int* p_allcards = new int[allcardssize];
+    int* p_allsuits = new int[allcardssize];
+    cout << "\n   Карты с общей руки: ";
+    fillallcards(p_allcards, allcardssize);
+    showallcardsftime(p_allcards);
+    cout << endl;
+    cout << "   Масти с общей руки: ";
+    fillallsuits(p_allsuits, allcardssize);
+    showallsuitsftime(p_allsuits);
+    int thuserchoice, secbet;
+    cout << "\nНасколько вы хотите увеличить ставку? - "; cin >> secbet;
+    result = result - secbet;
+    cout << "Ваш нынешний капитал: " << result << "." << " Сумма ваших ставок: " << bet + secbet;
+    if (bet + secbet > 250)
+        abort();
+    //-------------------------------------------
+    cout << "\n Ваш выбор: " << endl;
+    cout << " 1 - Выйти из игры\n 2 - Продолжить игру - "; cin >> thuserchoice;
+    switch (thuserchoice)
+    {
+    case secExit:
+    {
+        cout << "Хорошо, до свидания.";
+        break;
+    }
+    case Check:
+    {
+        cout << "Хорошо, открываем четвертую карту: ";
+        break;
+    }
+    default:
+        break;
+    }
+    cout << "\n   Карты с общей руки: ";
+    showallcardsstime(p_allcards);
+    cout << endl;
+    cout << "   Масти с общей руки: ";
+    showallsuitsstime(p_allsuits);
+    //--------------------------------------------
+    int fuserchoice, thirdbet;
+    cout << "\nНасколько вы хотите увеличить ставку? - "; cin >> thirdbet;
+    result = result - thirdbet;
+    cout << "Ваш ныншений капитал: " << result << ". " << "Сумма ваших ставок: " << bet + secbet + thirdbet;
+    if (bet + secbet + thirdbet > 250)
+        abort();
+    //--------------------------------------------
+    cout << "\n Ваш выбор: " << endl;
+    cout << " 1 - Выйти из игры\n 2 - Продолжить игру - "; cin >> fuserchoice;
+    switch (fuserchoice)
+    {
+    case thExit:
+    {
+        cout << "Хорошо, до свидания.";
+        break;
+    }
+    case Cocheck:
+    {
+        cout << "Хорошо, открываем пятую карту: ";
+        break;
+    }
+    default:
+        break;
+    }
+    cout << "\n   Карты с общей руки: ";
+    showallcardsttime(p_allcards);
+    cout << endl;
+    cout << "   Масти с общей руки: ";
+    showallsuitsttime(p_allsuits);
+    cout << "\nПодсчитываем итоги! " << endl;
+    int* p_allinone = new int[allinonesize];
+    for (int i = 0; i < 5; i++)
+    {
+        p_allinone[i] = p_allcards[i];
+    }
+    for (int i = 0; i < 7; i++)
+    {
+        p_allinone[i + 5] = p_cardsrank[i];
+        cout << p_allinone[i] << " ";
+    }
+    cout << "==";
+    for (int i = 0; i < 7; i++)
+    {
+        cout << p_allinone[i] << " ";
+    }
+}
